@@ -1,3 +1,5 @@
+import { chainReducer } from '~/util/chainReducer'
+
 import type { FlatSafe, PrivateKey, PublicKey, ID } from '~/type'
 import type { Action } from '~/store/action/type'
 
@@ -17,7 +19,17 @@ export const defaultState: State = {
   keysBySafeId: {},
 }
 
-export const reduce = (state: State, action: Action): State => {
+const reduceLocalStorage = (state: State, action: Action): State => {
+  if (action.type === 'localStorage:read' && action.keys)
+    return {
+      ...state,
+      ...action.keys,
+    }
+
+  return state
+}
+
+const reduceMutation = (state: State, action: Action): State => {
   state = state || defaultState
 
   switch (action.type) {
@@ -84,3 +96,5 @@ export const reduce = (state: State, action: Action): State => {
 
   return state
 }
+
+export const reduce = chainReducer(reduceLocalStorage, reduceMutation)

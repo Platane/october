@@ -63,3 +63,7 @@ export type Action =
       type: 'safe:get:success',
       safe: Safe,
     }
+  | {
+      type: 'localStorage:read',
+      keys: any | null,
+    }
