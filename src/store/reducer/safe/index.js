@@ -1,14 +1,14 @@
-import type { Safe, PrivateKey, PublicKey, ID } from '~/type'
+import type { FlatSafe, PrivateKey, PublicKey, ID } from '~/type'
 import type { Action } from '~/store/action/type'
 
 export type State = {
-  safePrivateKeyById: { [safeId: PrivateKey]: Safe },
+  safePrivateKeyById: { [safeId: PrivateKey]: FlatSafe },
 
   keysBySafeId: {
     [safeId: PrivateKey]: { privateKey: PrivateKey, publicKey: PublicKey },
   },
 
-  safeById: { [safeId: ID]: Safe },
+  safeById: { [safeId: ID]: FlatSafe },
 }
 
 export const defaultState: State = {
@@ -62,6 +62,21 @@ export const reduce = (state: State, action: Action): State => {
           [action.safe.id]: {
             publicKey: action.userPublicKey,
             privateKey: action.userPrivateKey,
+          },
+        },
+      }
+
+    case 'safe:transaction:create:success':
+      return {
+        ...state,
+        safeById: {
+          ...state.safeById,
+          [action.safeId]: {
+            ...state.safeById[action.safeId],
+            transactions: [
+              ...state.safeById[action.safeId].transactions,
+              action.transaction,
+            ],
           },
         },
       }

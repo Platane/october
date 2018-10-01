@@ -19,8 +19,8 @@ const create = () => {
   const getSafe = (safeId: ID): Promise<SafeBlob | null> =>
     resolve(safeById[(safeId: any)])
 
-  const createSafe = (meta: Blob, creator: Blob): Promise<ID> => {
-    const safeId = genUID()
+  const createSafe = (safeId: ID, meta: Blob, creator: Blob) => {
+    if (safeById[(safeId: any)]) throw new Error(409)
 
     safeById[(safeId: any)] = {
       users: [creator],
@@ -28,13 +28,13 @@ const create = () => {
       meta: meta,
     }
 
-    return resolve(safeId)
+    return resolve()
   }
 
   const getTransactions = (safeId: ID) => (cursor: Cursor) =>
     resolve((safeById[(safeId: any)] || {}).transactions)
 
-  const putTransaction = (safeId: string) => (transaction: Blob) => {
+  const putTransaction = (safeId: ID) => (transaction: Blob) => {
     const safe = safeById[(safeId: any)]
 
     if (!safe) throw new Error(404)

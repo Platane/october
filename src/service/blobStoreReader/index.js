@@ -10,7 +10,7 @@ import {
 import * as blobStore from '~/service/blobStore'
 
 import type { PrivateKey, PublicKey } from '~/service/crypto'
-import type { ID, User, Transaction } from '~/type'
+import type { ID, User, FlatTransaction } from '~/type'
 
 const createBlob = (safePrivateKey: PrivateKey) => (
   creatorPrivateKey: PrivateKey,
@@ -41,6 +41,7 @@ const create = (blobStore: *) => {
   const createSafe = async (
     user: User,
     userPrivateKey: PrivateKey,
+    safeId: ID,
     safePrivateKey: PrivateKey,
     safeName: string
   ) => {
@@ -55,9 +56,7 @@ const create = (blobStore: *) => {
       { name: safeName }
     )
 
-    const safeId = await blobStore.createSafe(metaBlob, creatorBlob)
-
-    return safeId
+    await blobStore.createSafe(safeId, metaBlob, creatorBlob)
   }
 
   /**
@@ -76,6 +75,26 @@ const create = (blobStore: *) => {
     )
 
     await blobStore.putUser(safeId)(userBlob)
+  }
+
+  /**
+   * add a transaction
+   */
+  const createTransaction = async (
+    userPublicKey: PublicKey,
+    userPrivateKey: PrivateKey,
+    safeId: ID,
+    safePrivateKey: PrivateKey,
+    transaction: FlatTransaction
+  ) => {
+    verifyKey(userPublicKey, userPrivateKey)
+
+    const transactionBlob = createBlob(safePrivateKey)(
+      userPrivateKey,
+      userPublicKey
+    )(transaction)
+
+    await blobStore.putTransaction(safeId)(transactionBlob)
   }
 
   /**
@@ -102,16 +121,12 @@ const create = (blobStore: *) => {
       .filter(Boolean)
 
     // read transactions
-    const transactions: Transaction[] = blob.transactions
+    const transactions: FlatTransaction[] = blob.transactions
       .map(transactionBlob => {
         const { creatorPublicKey, payload } =
           readBlob(safePrivateKey)(transactionBlob) || {}
 
-        if (
-          !creatorPublicKey ||
-          users.some(u => u.publicKey === creatorPublicKey)
-        )
-          return null
+        if (!users.some(u => u.publicKey === creatorPublicKey)) return null
 
         return ({
           ...payload,
@@ -137,7 +152,7 @@ const create = (blobStore: *) => {
     return safe
   }
 
-  return { createSafe, addUserToSafe, getSafe }
+  return { createSafe, addUserToSafe, createTransaction, getSafe }
 }
 
 const blobStoreReader = create(blobStore)

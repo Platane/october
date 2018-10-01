@@ -11,12 +11,7 @@ export const createSafe = (name: string) => async (
   getState: () => State
 ) => {
   const mutationKey = genUID()
-
-  dispatch({
-    type: 'safe:create:start',
-    name,
-    mutationKey,
-  })
+  const safeId = genUID()
 
   const state = getState()
 
@@ -32,12 +27,22 @@ export const createSafe = (name: string) => async (
     publicKey: userPublicKey,
   }
 
-  const safeId = await blobStore.createSafe(
-    user,
-    userPrivateKey,
+  dispatch({
+    type: 'safe:create:start',
+    safe: {
+      name,
+      id: safeId,
+      creator: user,
+      users: [user],
+      transactions: [],
+    },
+    mutationKey,
     safePrivateKey,
-    name
-  )
+    userPublicKey,
+    userPrivateKey,
+  })
+
+  await blobStore.createSafe(user, userPrivateKey, safeId, safePrivateKey, name)
 
   dispatch({
     type: 'safe:create:success',

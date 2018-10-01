@@ -1,4 +1,11 @@
-import type { User, PrivateKey, PublicKey, Safe, ID } from '~/type'
+import type {
+  User,
+  FlatTransaction,
+  PrivateKey,
+  PublicKey,
+  Safe,
+  ID,
+} from '~/type'
 
 export type Action =
   | {
@@ -22,8 +29,23 @@ export type Action =
     }
   | {
       type: 'safe:create:start',
+      safe: Safe,
       mutationKey: ID,
-      name: string,
+      safePrivateKey: PrivateKey,
+      userPrivateKey: PrivateKey,
+      userPublicKey: PublicKey,
+    }
+  | {
+      type: 'safe:transaction:create:start',
+      transaction: FlatTransaction,
+      mutationKey: ID,
+      safeId: ID,
+    }
+  | {
+      type: 'safe:transaction:create:success',
+      transaction: FlatTransaction,
+      mutationKey: ID,
+      safeId: ID,
     }
   | {
       type: 'safe:create:success',
