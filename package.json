@@ -10,6 +10,7 @@
     "declarative-router": "0.1.4",
     "emotion": "9.2.10",
     "flow-typed": "2.5.1",
+    "instascan": "1.0.0",
     "node-fetch": "2.2.0",
     "prop-types": "15.6.2",
     "react": "16.5.2",
