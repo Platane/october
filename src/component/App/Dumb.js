@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'react-emotion'
+import { Home } from '../_page/Home'
+import { CreateSafe } from '../_page/CreateSafe'
 
 const FourOFour = ({ routerKey, ...props }) => (
   <div>
@@ -11,7 +13,11 @@ const FourOFour = ({ routerKey, ...props }) => (
 const Content = ({ router, ...props }) => {
   switch (router.key) {
     case 'home':
+      return <Home />
+
     case 'createSafe':
+      return <CreateSafe />
+
     case 'safe':
     case 'createTransaction':
     case 'transaction':

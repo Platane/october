@@ -26,6 +26,12 @@ export const selectCurrentSafe = createSelector(
     safeById[safeId] ? hydrateSafe(safeById[safeId]) : null
 )
 
+export const selectSafeList = createSelector(
+  state => state.safe.safePrivateKeyById,
+
+  safePrivateKeyById => Object.keys(safePrivateKeyById).map(id => ({ id }))
+)
+
 export const selectCurrentSafePrivateKey = createSelector(
   selectCurrentSafeId,
   state => state.safe.safePrivateKeyById,
