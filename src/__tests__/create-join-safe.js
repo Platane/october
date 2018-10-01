@@ -1,15 +1,44 @@
 import test from 'tape'
-import { create, actions, selectCurrentSafe } from '~/store'
+import {
+  create,
+  actions,
+  selectCurrentSafe,
+  selectCurrentSafeId,
+  selectCurrentSafePrivateKey,
+} from '~/store'
+import { init as initResourceFetcher } from '~/sideEffect/resourceFetcher'
+
 import { waitFor } from '~/util/waitFor'
+import type { ID } from '~/type'
+
+const sideEffects = [initResourceFetcher]
 
 test('scenario', async t => {
-  const store = create()
+  /**
+   * create a safe from storeA
+   */
 
-  store.dispatch(actions.createSafe('week end à rome'))
+  const storeA = create(sideEffects)
 
-  await waitFor(store, selectCurrentSafe)
+  storeA.dispatch(actions.createSafe('week end à rome'))
 
-  t.pass('got the safe')
+  await waitFor(storeA, selectCurrentSafe)
+
+  t.pass('got the safe created')
+
+  /**
+   * join the safe from storeB
+   */
+
+  const storeB = create(sideEffects)
+  const safeId: ID = (selectCurrentSafeId(storeA.getState()): any)
+  const safePrivateKey = selectCurrentSafePrivateKey(storeA.getState())
+
+  storeB.dispatch(actions.joinSafe(safeId, safePrivateKey))
+
+  await waitFor(storeB, selectCurrentSafe)
+
+  t.pass('got the safe joined')
 
   t.end()
 })

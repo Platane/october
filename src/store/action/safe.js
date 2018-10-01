@@ -1,9 +1,6 @@
 import { genUID } from '~/util/uid'
-import {
-  selectUser,
-  selectUserPublicKey,
-  selectUserPrivateKey,
-} from '~/store/selector'
+import { selectUserIdentity } from '~/store/selector'
+import { createPrivateKey, createPublicKey } from '~/service/crypto'
 import * as blobStore from '~/service/blobStoreReader'
 import type { PrivateKey, ID } from '~/type'
 import type { Action } from './type'
@@ -23,13 +20,24 @@ export const createSafe = (name: string) => async (
 
   const state = getState()
 
-  const user = selectUser(state)
-  const privateKey = selectUserPrivateKey(state)
+  // generate some keys
+  const safePrivateKey = createPrivateKey()
 
-  const { safeId, safePrivateKey } = await blobStore.createSafe(
+  const userPrivateKey = createPrivateKey()
+  const userPublicKey = createPublicKey(userPrivateKey)
+
+  // create the user
+  const user = {
+    ...selectUserIdentity(state),
+    publicKey: userPublicKey,
+  }
+
+  const safeId = await blobStore.createSafe(
     user,
-    privateKey
-  )(name)
+    userPrivateKey,
+    safePrivateKey,
+    name
+  )
 
   dispatch({
     type: 'safe:create:success',
@@ -42,11 +50,54 @@ export const createSafe = (name: string) => async (
     },
     mutationKey,
     safePrivateKey,
+    userPublicKey,
+    userPrivateKey,
   })
 }
 
-export const joinSafe = (safeId: ID, safePrivateKey: PrivateKey) => ({
-  type: 'safe:join',
-  safeId,
-  safePrivateKey,
-})
+export const joinSafe = (safeId: ID, safePrivateKey: PrivateKey) => async (
+  dispatch: (action: Action) => void,
+  getState: () => State
+) => {
+  const mutationKey = genUID()
+
+  const state = getState()
+
+  const keys = state.safe.keysBySafeId[safeId]
+
+  if (keys) {
+    dispatch({
+      type: 'safe:join:failure',
+      safeId,
+      mutationKey,
+      error: new Error('409 - user already joined'),
+    })
+  } else {
+    dispatch({
+      type: 'safe:join:start',
+      safeId,
+      mutationKey,
+    })
+
+    // generate some keys
+    const userPrivateKey = createPrivateKey()
+    const userPublicKey = createPublicKey(userPrivateKey)
+
+    // create the user
+    const user = {
+      ...selectUserIdentity(state),
+      publicKey: userPublicKey,
+    }
+
+    await blobStore.addUserToSafe(user, userPrivateKey, safeId, safePrivateKey)
+
+    dispatch({
+      type: 'safe:join:success',
+      safeId,
+      mutationKey,
+      safePrivateKey,
+      userPrivateKey,
+      userPublicKey,
+    })
+  }
+}

@@ -5,13 +5,12 @@ import {
   decodeObject,
   createPrivateKey,
   createPublicKey,
+  verifyKey,
 } from '~/service/crypto'
 import * as blobStore from '~/service/blobStore'
 
 import type { PrivateKey, PublicKey } from '~/service/crypto'
-import type { ID, User } from '~/type'
-
-const challenge = 'abcdef'
+import type { ID, User, Transaction } from '~/type'
 
 const createBlob = (safePrivateKey: PrivateKey) => (
   creatorPrivateKey: PrivateKey,
@@ -23,10 +22,11 @@ const createBlob = (safePrivateKey: PrivateKey) => (
   )
 
 const readBlob = (safePrivateKey: PrivateKey) => (payload: *) => {
-  const [creatorPublicKey, p] = decode(
-    payload,
-    createPublicKey(safePrivateKey)
-  ).split('.')
+  const decoded = decode(payload, createPublicKey(safePrivateKey))
+
+  if (!decoded) return null
+
+  const [creatorPublicKey, p] = decoded.split('.')
 
   return {
     creatorPublicKey,
@@ -35,63 +35,109 @@ const readBlob = (safePrivateKey: PrivateKey) => (payload: *) => {
 }
 
 const create = (blobStore: *) => {
-  const createSafe = (user: User, privateKey: PrivateKey) => async (
-    name: string
+  /**
+   * create a safe
+   */
+  const createSafe = async (
+    user: User,
+    userPrivateKey: PrivateKey,
+    safePrivateKey: PrivateKey,
+    safeName: string
   ) => {
-    if (decode(sign(challenge, privateKey), user.publicKey) !== challenge)
-      throw new Error('keys does not match')
+    verifyKey(user.publicKey, userPrivateKey)
 
-    const safePrivateKey = createPrivateKey()
+    const creatorBlob = createBlob(safePrivateKey)(
+      userPrivateKey,
+      user.publicKey
+    )(user)
 
-    const creatorBlob = createBlob(safePrivateKey)(privateKey, user.publicKey)(
+    const metaBlob = createBlob(safePrivateKey)(userPrivateKey, user.publicKey)(
+      { name: safeName }
+    )
+
+    const safeId = await blobStore.createSafe(metaBlob, creatorBlob)
+
+    return safeId
+  }
+
+  /**
+   * add an user to an existing safe
+   */
+  const addUserToSafe = async (
+    user: User,
+    userPrivateKey: PrivateKey,
+    safeId: ID,
+    safePrivateKey: PrivateKey
+  ) => {
+    verifyKey(user.publicKey, userPrivateKey)
+
+    const userBlob = createBlob(safePrivateKey)(userPrivateKey, user.publicKey)(
       user
     )
 
-    const metaBlob = createBlob(safePrivateKey)(privateKey, user.publicKey)({
-      name,
-    })
-
-    const safeId: any = await blobStore.createSafe(metaBlob, creatorBlob)
-
-    return { safeId, safePrivateKey }
+    await blobStore.putUser(safeId)(userBlob)
   }
 
+  /**
+   * get a safe
+   */
   const getSafe = async (safeId: ID, safePrivateKey: PrivateKey) => {
     const blob = await blobStore.getSafe(safeId)
 
     if (!blob) return null
 
-    const users = blob.users.map(userBlob => {
-      const { creatorPublicKey, payload } = readBlob(safePrivateKey)(userBlob)
+    // read users
+    const users: User[] = blob.users
+      .map(userBlob => {
+        const { creatorPublicKey, payload } =
+          readBlob(safePrivateKey)(userBlob) || {}
 
-      return {
-        ...payload,
-        creatorPublicKey,
-      }
-    })
+        if (!creatorPublicKey) return null
 
-    const transactions = blob.transactions.map(transactionBlob => {
-      const { creatorPublicKey, payload } = readBlob(safePrivateKey)(
-        transactionBlob
-      )
+        return ({
+          ...payload,
+          creatorPublicKey,
+        }: any)
+      })
+      .filter(Boolean)
 
-      return {
-        ...payload,
-        creatorPublicKey,
-      }
-    })
+    // read transactions
+    const transactions: Transaction[] = blob.transactions
+      .map(transactionBlob => {
+        const { creatorPublicKey, payload } =
+          readBlob(safePrivateKey)(transactionBlob) || {}
 
-    const { creatorPublicKey, payload } = readBlob(safePrivateKey)(blob.meta)
+        if (
+          !creatorPublicKey ||
+          users.some(u => u.publicKey === creatorPublicKey)
+        )
+          return null
+
+        return ({
+          ...payload,
+          creatorPublicKey,
+        }: any)
+      })
+      .filter(Boolean)
+
+    // read read safe meta
+    const { creatorPublicKey, payload } =
+      readBlob(safePrivateKey)(blob.meta) || {}
+
+    if (!creatorPublicKey) return null
 
     const safe = {
       ...payload,
+      id: safeId,
       creatorPublicKey,
       users,
       transactions,
     }
+
+    return safe
   }
 
-  return { createSafe, getSafe }
+  return { createSafe, addUserToSafe, getSafe }
 }
 
 const blobStoreReader = create(blobStore)

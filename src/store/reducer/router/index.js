@@ -23,7 +23,13 @@ export const reduceRedirect = (state: State, action: Action) => {
     case 'safe:create:success':
       return {
         ...state,
-        ...resolveRoute(`/safe/${action.safe.id}`),
+        ...resolveRoute(`/safe/${(action.safe.id: any)}`),
+      }
+
+    case 'safe:join:success':
+      return {
+        ...state,
+        ...resolveRoute(`/safe/${(action.safeId: any)}`),
       }
   }
 

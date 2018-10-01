@@ -4,15 +4,22 @@ export type Blob = string
 
 opaque type Cursor = string
 
+export type SafeBlob = {
+  users: Blob[],
+  transactions: Blob[],
+  meta: Blob,
+}
+
 const wait = (delay = 0) => new Promise(r => setTimeout(r, delay))
 const resolve = x => wait(100).then(() => x)
 
 const create = () => {
   const safeById = {}
 
-  const getSafe = (safeId: ID) => resolve(safeById[(safeId: any)])
+  const getSafe = (safeId: ID): Promise<SafeBlob | null> =>
+    resolve(safeById[(safeId: any)])
 
-  const createSafe = (meta: Blob, creator: Blob) => {
+  const createSafe = (meta: Blob, creator: Blob): Promise<ID> => {
     const safeId = genUID()
 
     safeById[(safeId: any)] = {
@@ -37,7 +44,7 @@ const create = () => {
     return resolve()
   }
 
-  const putUser = (safeId: string) => (user: Blob) => {
+  const putUser = (safeId: ID) => (user: Blob) => {
     const safe = safeById[(safeId: any)]
 
     if (!safe) throw new Error(404)
