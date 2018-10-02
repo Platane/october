@@ -3,4 +3,5 @@ npm-debug.log*
 yarn-error.log*
 lib
 dist
+.build
 flow-typed

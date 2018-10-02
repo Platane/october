@@ -1,0 +1,202 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: 'Blobstore stack, create a dynamodb instance, and the lambda backed API gateway'
+
+Parameters:
+  Stage:
+    Type: String
+    Default: staging
+    Description: deployment stage
+
+Globals:
+  Function:
+    Handler: index.handler
+    Runtime: nodejs8.10
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Ref AWS::StackName
+
+  safeResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt apiGateway.RootResourceId
+      RestApiId: !Ref apiGateway
+      PathPart: 'safe'
+
+  safeSafeIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref safeResource
+      RestApiId: !Ref apiGateway
+      PathPart: '{safeId}'
+
+  safeSafeIdTransactionResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref safeSafeIdResource
+      RestApiId: !Ref apiGateway
+      PathPart: 'transaction'
+
+  safeSafeIdTransactionTransactionIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref safeSafeIdTransactionResource
+      RestApiId: !Ref apiGateway
+      PathPart: '{transactionId}'
+
+  safeSafeIdUserResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref safeSafeIdResource
+      RestApiId: !Ref apiGateway
+      PathPart: 'user'
+
+  safeSafeIdUserUserIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref safeSafeIdUserResource
+      RestApiId: !Ref apiGateway
+      PathPart: '{userId}'
+
+  safeSafeIdMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt storeLambda.Arn
+      ResourceId: !Ref safeSafeIdResource
+      RestApiId: !Ref apiGateway
+
+  safeSafeIdMethodPut:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: PUT
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt storeLambda.Arn
+      ResourceId: !Ref safeSafeIdResource
+      RestApiId: !Ref apiGateway
+
+  safeSafeIdTransactionMethodPut:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: PUT
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt storeLambda.Arn
+      ResourceId: !Ref safeSafeIdTransactionResource
+      RestApiId: !Ref apiGateway
+
+  safeSafeIdUserMethodPut:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: PUT
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt storeLambda.Arn
+      ResourceId: !Ref safeSafeIdUserResource
+      RestApiId: !Ref apiGateway
+
+  apiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - safeSafeIdMethodPut
+      - safeSafeIdMethodGet
+    Properties:
+      RestApiId: !Ref apiGateway
+      StageName: !Ref Stage
+
+  storeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: '../.build/bundle.zip'
+      Role: !GetAtt storeLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          SAFE_TABLE: !Ref safeTable
+
+  storeLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: allow-access-to-lambda-from-appsync
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGrou
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                Resource: '*'
+
+                # - !Sub 'arn:aws:dynamodb:${AWS::Region}:{AWS::AccountId}:table/{safeTable}'
+                #
+  storeLambdaApiGatewayInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt storeLambda.Arn
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/*/*'
+
+  safeTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: 'id'
+          AttributeType: 'S'
+
+      KeySchema:
+        - AttributeName: 'id'
+          KeyType: 'HASH'
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  appUrl:
+    Description: 'app endpoint URL'
+    Value: !Sub 'https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/'

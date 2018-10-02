@@ -1,0 +1,41 @@
+{
+  "name": "@october/blobstore-aws-dynamodb",
+  "description": "...",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "8.10"
+  },
+  "dependencies": {
+    "aws-sdk": "2.326.0",
+    "flow-aws-lambda": "1.0.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.1.0",
+    "@babel/core": "7.1.0",
+    "@babel/node": "7.0.0",
+    "@babel/plugin-proposal-class-properties": "7.1.0",
+    "@babel/plugin-proposal-export-namespace-from": "7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0",
+    "@babel/plugin-transform-modules-commonjs": "7.1.0",
+    "@babel/preset-env": "7.1.0",
+    "@babel/preset-flow": "7.0.0",
+    "babel-plugin-flow-runtime": "0.17.0",
+    "babel-plugin-module-resolver": "3.1.1",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "clean-webpack-plugin": "^0.1.19",
+    "flow-bin": "0.81.0",
+    "flow-runtime": "0.17.0",
+    "flow-typed": "2.5.1",
+    "prettier": "1.14.3",
+    "tap-spec": "5.0.0",
+    "tape": "4.9.1",
+    "webpack": "4.16.5",
+    "webpack-cli": "3.1.0",
+    "zip-webpack-plugin": "^3.0.0"
+  },
+  "scripts": {
+    "build": "webpack --config ./script/webpack.config.js",
+    "test": "BABEL_ENV=test babel-node ./src/__tests__/index.js | tap-spec"
+  }
+}

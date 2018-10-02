@@ -12,6 +12,6 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "( cd packages/app && yarn test )"
+    "test": "( cd packages/app && yarn test ) && ( cd packages/blobstore-aws-dynamodb && yarn test )"
   }
 }

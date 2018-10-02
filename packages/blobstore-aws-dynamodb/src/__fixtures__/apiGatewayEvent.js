@@ -1,0 +1,36 @@
+// import type { APIGatewayEvent } from 'flow-aws-lambda'
+
+export const apiGatewayEvent = {
+  path: '/',
+  body: null,
+  headers: {},
+  httpMethod: 'GET',
+  stageVariables: {},
+  pathParameters: {},
+  queryStringParameters: {},
+  isBase64Encoded: false,
+  resource: '',
+  requestContext: {
+    accountId: '',
+    apiId: '',
+    httpMethod: '',
+    identity: {
+      accessKey: null,
+      accountId: null,
+      apiKey: null,
+      caller: null,
+      cognitoAuthenticationProvider: null,
+      cognitoAuthenticationType: null,
+      cognitoIdentityId: null,
+      cognitoIdentityPoolId: null,
+      sourceIp: '',
+      user: null,
+      userAgent: null,
+      userArn: null,
+    },
+    stage: '',
+    requestId: '',
+    resourceId: '',
+    resourcePath: '',
+  },
+}
