@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'react-emotion'
 import { Home } from '../_page/Home'
+import { ShareSafe } from '../_page/ShareSafe'
 import { CreateSafe } from '../_page/CreateSafe'
 
 const FourOFour = ({ routerKey, ...props }) => (
@@ -17,6 +18,9 @@ const Content = ({ router, ...props }) => {
 
     case 'createSafe':
       return <CreateSafe />
+
+    case 'shareSafe':
+      return <ShareSafe />
 
     case 'safe':
     case 'createTransaction':

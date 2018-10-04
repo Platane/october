@@ -40,8 +40,6 @@ test('scenario share-url', async t => {
 
   const sharedUrl = url.parse(selectCurrentSafeShareUrl(storeA.getState()))
 
-  console.log(sharedUrl)
-
   storeB.dispatch(
     actions.goTo(
       sharedUrl.path,

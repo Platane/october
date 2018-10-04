@@ -11,7 +11,9 @@ export const Home = ({ safes }: Props) => (
 
     <List>
       {safes.map(safe => (
-        <span />
+        <Link key={safe.id} href={`/safe/${safe.id}`}>
+          <Item>{safe.id}</Item>
+        </Link>
       ))}
     </List>
 
@@ -20,11 +22,6 @@ export const Home = ({ safes }: Props) => (
     </Link>
   </Container>
 )
-{
-  /* <Link key={safe.id} href={`/safe/${safe.id}`}>
-<Item>{safe.id}</Item>
-</Link> */
-}
 
 const Container = styled.div``
 const List = styled.div`
