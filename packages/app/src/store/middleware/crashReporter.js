@@ -1,4 +1,6 @@
-export const middleware = store => next => action => {
+import type { Middleware } from 'redux'
+
+export const middleware: Middleware<*, *, *> = store => next => action => {
   try {
     return next(action)
   } catch (err) {

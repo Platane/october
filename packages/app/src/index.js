@@ -1,5 +1,3 @@
-import 'unfetch/polyfill'
-
 import { create } from './store/index'
 
 import { init as initUi } from '~/sideEffect/ui'

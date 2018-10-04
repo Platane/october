@@ -45,23 +45,26 @@ test('scenario', async t => {
    * create a new transaction from storeB
    */
 
+  const publicKeys = [
+    (selectCurrentUserPublicKey(storeA.getState()): any),
+    (selectCurrentUserPublicKey(storeB.getState()): any),
+  ]
+
   storeB.dispatch(
     actions.createTransaction(
       'karaoke',
       45,
-      [selectCurrentUserPublicKey(storeA.getState())],
-      [
-        selectCurrentUserPublicKey(storeA.getState()),
-        selectCurrentUserPublicKey(storeB.getState()),
-      ],
+      [publicKeys[0]],
+      [publicKeys[0], publicKeys[1]],
       Date.now()
     )
   )
 
-  await waitFor(
-    storeB,
-    state => selectCurrentSafe(state).transactions.length > 0
-  )
+  await waitFor(storeB, state => {
+    const safe = selectCurrentSafe(state)
+
+    return safe && safe.transactions.length > 0
+  })
 
   t.pass('got the transaction created')
 
@@ -73,7 +76,7 @@ test('scenario', async t => {
 
   storeC.dispatch(actions.joinSafe(safeId, safePrivateKey))
 
-  const safe = await waitFor(storeC, selectCurrentSafe)
+  const safe: any = await waitFor(storeC, selectCurrentSafe)
 
   t.assert(
     safe.transactions.length === 1,

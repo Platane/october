@@ -1,11 +1,14 @@
 // @flow
 
-import type { State } from '~/store'
+import type { Store } from 'redux'
 
 /**
  * return a promise which resolve when the condition function return truthly
  */
-export const waitFor = (store: any, condition: (state: State) => any) =>
+export const waitFor = <State, T>(
+  store: Store<State, *, *>,
+  condition: (state: State) => T
+): Promise<T> =>
   new Promise(resolve => {
     let unsubscribe
 

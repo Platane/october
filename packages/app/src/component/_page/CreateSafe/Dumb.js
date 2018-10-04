@@ -6,7 +6,13 @@ const Input = ({ value, onChange, ...props }) => (
   <input {...props} value={value} onChange={e => onChange(e.target.value)} />
 )
 
-export const CreateSafe = ({ value, onChange, onSubmit }) => (
+type Props = {
+  value: { name: string },
+  onChange: (safe: { name: string }) => void,
+  onSubmit: () => void,
+}
+
+export const CreateSafe = ({ value, onChange, onSubmit }: Props) => (
   <Container>
     <h1>Create safe</h1>
 

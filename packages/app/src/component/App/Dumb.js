@@ -26,7 +26,11 @@ const Content = ({ router, ...props }) => {
   }
 }
 
-export const App = props => (
+type Props = {
+  router: { key: string },
+}
+
+export const App = (props: Props) => (
   <Container>
     <Content {...props} />
   </Container>

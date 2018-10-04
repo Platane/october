@@ -20,6 +20,7 @@
     "react-redux": "5.0.7",
     "redux": "4.0.0",
     "redux-thunk": "2.3.0",
+    "reselect": "3.0.0",
     "unfetch": "4.0.1"
   },
   "devDependencies": {
@@ -54,6 +55,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode development --config ./script/webpack.config.js",
     "test:browser": "NODE_ENV=test webpack-dev-server --port 3001 --mode development --config ./script/webpack.config.test.js",
-    "test": "NODE_ENV=test babel-node ./src/__tests__/index.js | tap-spec"
+    "test": "NODE_ENV=test babel-node ./src/__tests__/index.js | tap-spec",
+    "type": "flow"
   }
 }

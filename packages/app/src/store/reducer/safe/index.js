@@ -4,10 +4,10 @@ import type { FlatSafe, PrivateKey, PublicKey, ID } from '~/type'
 import type { Action } from '~/store/action/type'
 
 export type State = {
-  safePrivateKeyById: { [safeId: PrivateKey]: FlatSafe },
+  safePrivateKeyById: { [safeId: ID]: PrivateKey },
 
   keysBySafeId: {
-    [safeId: PrivateKey]: { privateKey: PrivateKey, publicKey: PublicKey },
+    [safeId: ID]: { privateKey: PrivateKey, publicKey: PublicKey },
   },
 
   safeById: { [safeId: ID]: FlatSafe },

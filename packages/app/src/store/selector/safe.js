@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 
 import type { State } from '../reducer'
-import type { ID, FlatSafe, Safe } from '~/type'
+import type { ID, FlatSafe, Safe, PrivateKey } from '~/type'
 
 const hydrateSafe = ({ users, transactions, ...rest }: FlatSafe): Safe =>
   ({
@@ -23,7 +23,7 @@ export const selectCurrentSafe = createSelector(
   state => state.safe.safeById,
 
   (safeId, safeById) =>
-    safeById[safeId] ? hydrateSafe(safeById[safeId]) : null
+    safeId && safeById[safeId] ? hydrateSafe(safeById[safeId]) : null
 )
 
 export const selectSafeList = createSelector(
@@ -36,5 +36,5 @@ export const selectCurrentSafePrivateKey = createSelector(
   selectCurrentSafeId,
   state => state.safe.safePrivateKeyById,
 
-  (safeId, safePrivateKeyById) => safePrivateKeyById[safeId] || null
+  (safeId, safePrivateKeyById) => safePrivateKeyById[(safeId: any)]
 )

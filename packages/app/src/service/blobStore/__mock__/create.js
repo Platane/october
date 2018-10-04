@@ -1,23 +1,18 @@
 import { genUID } from '~/util/uid'
 import type { ID, User } from '~/type'
-export type Blob = string
+import type { Cursor, Blob, SafeBlob } from '../type'
 
-opaque type Cursor = string
+import * as api from '../index'
 
-export type SafeBlob = {
-  users: Blob[],
-  transactions: Blob[],
-  meta: Blob,
-}
+type API = typeof api
 
 const wait = (delay = 0) => new Promise(r => setTimeout(r, delay))
-const resolve = x => wait(100).then(() => x)
+const resolve = <T>(x: T): Promise<T> => wait(100).then(() => x)
 
-export const create = () => {
+export const create = (): API => {
   const safeById = {}
 
-  const getSafe = (safeId: ID): Promise<SafeBlob | null> =>
-    resolve(safeById[(safeId: any)])
+  const getSafe = (safeId: ID) => resolve(safeById[(safeId: any)] || null)
 
   const createSafe = (safeId: ID, meta: Blob, creator: Blob) => {
     if (safeById[(safeId: any)]) throw new Error(409)
@@ -30,9 +25,6 @@ export const create = () => {
 
     return resolve()
   }
-
-  const getTransactions = (safeId: ID) => (cursor: Cursor) =>
-    resolve((safeById[(safeId: any)] || {}).transactions)
 
   const putTransaction = (safeId: ID) => (transaction: Blob) => {
     const safe = safeById[(safeId: any)]
@@ -57,7 +49,6 @@ export const create = () => {
   return {
     getSafe,
     createSafe,
-    getTransactions,
     putTransaction,
     putUser,
   }

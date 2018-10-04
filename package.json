@@ -12,6 +12,8 @@
     "packages/*"
   ],
   "scripts": {
+    "start": "(cd ./packages/app ; yarn start)",
+    "test:browser": "(cd ./packages/app ; yarn test:browser)",
     "test": "( cd packages/app && yarn test ) && ( cd packages/blobstore-aws-dynamodb && yarn test )"
   }
 }

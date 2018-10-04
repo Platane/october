@@ -4,6 +4,8 @@ import { debounce } from '~/util/time'
 
 import { createSelector } from 'reselect'
 
+import type { Store, State } from '~/store/type'
+
 const createPersist = (label, selector) => {
   let persisted = null
 
@@ -18,15 +20,16 @@ const createPersist = (label, selector) => {
 }
 
 const selectKeys = createSelector(
-  state => state.safe.safePrivateKeyById,
-  state => state.safe.keysBySafeId,
+  (state: State) => state.safe.safePrivateKeyById,
+  (state: State) => state.safe.keysBySafeId,
+
   (safePrivateKeyById, keysBySafeId) => ({
     safePrivateKeyById,
     keysBySafeId,
   })
 )
 
-export const init = store => {
+export const init = (store: Store) => {
   const persistKeys = createPersist('safe-keys', selectKeys)
 
   const update = () => {

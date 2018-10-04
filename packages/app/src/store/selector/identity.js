@@ -4,7 +4,7 @@ import { createPrivateKey, createPublicKey } from '~/service/crypto'
 
 import { selectCurrentSafeId } from './safe'
 
-import type { State } from '../reducer'
+import type { State } from '../type'
 import type { ID } from '~/type'
 
 export const selectUserIdentity = (state: State) => ({ name: 'tim' })
@@ -13,13 +13,13 @@ export const selectCurrentUserKeys = createSelector(
   selectCurrentSafeId,
   state => state.safe.keysBySafeId,
 
-  (safeId, keysBySafeId) => keysBySafeId[safeId] || null
+  (safeId, keysBySafeId) => keysBySafeId[(safeId: any)]
 )
 
 export const selectCurrentUserPublicKey = createSelector(
   selectCurrentUserKeys,
 
-  keys => (keys ? keys.publicKey : null)
+  (keys: { publicKey: string } | null) => (keys ? keys.publicKey : null)
 )
 
 export const selectCurrentUser = createSelector(

@@ -1,9 +1,12 @@
 import Instascan from 'instascan'
 
-export const scan = async videoElement => {
+export const scan = async (videoElement: HTMLVideoElement) => {
   const scanner = new Instascan.Scanner({ video: videoElement })
 
-  const cameras = await Instascan.Camera.getCameras()
+  const cameras: {
+    id: string,
+    name: string,
+  }[] = await Instascan.Camera.getCameras()
 
   if (cameras.length === 0) throw new Error('no camera found')
 
@@ -23,9 +26,9 @@ export const scan = async videoElement => {
     _resolve(content)
   })
 
-  const promise = new Promise(r => (resolve = r))
+  const promise: Promise<string> = new Promise(r => (resolve = r))
 
-  const switchCamera = async cameraId => {
+  const switchCamera = async (cameraId: string | null) => {
     if (currentCamera) await scanner.stop()
 
     currentCamera = cameras.find(({ id }) => id === cameraId)

@@ -1,4 +1,4 @@
-export opaque type ID = string
+export type ID = string
 export type Date = number
 
 import type { PublicKey, PrivateKey } from '~/service/crypto'

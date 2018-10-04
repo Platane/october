@@ -7,6 +7,8 @@ import { createSelector } from 'reselect'
 
 import * as safeFetcher from './safe'
 
+import type { Store, State } from '~/store/type'
+
 const fetchers = [
   //
   safeFetcher,
@@ -17,7 +19,7 @@ const fetchResource = store => ({ resourceName, key, ...param }) => {
 
   if (!fetcher) throw new Error('unknow resource')
 
-  fetcher.fetch(store)(param)
+  fetcher.fetch(store)((param: any))
 }
 
 // select resource that need to be fetched
@@ -26,8 +28,8 @@ const selectRequired = createSelector(
   selectCurrentSafe,
   selectCurrentSafePrivateKey,
 
-  (safeId, safe, safePrivateKey) =>
-    [
+  (safeId, safe, safePrivateKey): { resourceName: string, key: string }[] =>
+    ([
       //
       !safe &&
         safeId &&
@@ -37,10 +39,10 @@ const selectRequired = createSelector(
           safePrivateKey,
           key: `safe:${safeId}`,
         },
-    ].filter(Boolean)
+    ].filter(Boolean): any)
 )
 
-export const init = store => {
+export const init = (store: Store) => {
   const fetching = {}
 
   const update = async () => {

@@ -3,15 +3,15 @@ import styled from 'react-emotion'
 import { Link } from '~/component/Link'
 import type { Safe } from '~/type'
 
-export const Home = ({ safes }: { safes: Safe[] }) => (
+type Props = { safes: Safe[] }
+
+export const Home = ({ safes }: Props) => (
   <Container>
     <h1>Safe list</h1>
 
     <List>
       {safes.map(safe => (
-        <Link key={safe.id} href={`/safe/${safe.id}`}>
-          <Item>{safe.id}</Item>
-        </Link>
+        <span />
       ))}
     </List>
 
@@ -20,6 +20,11 @@ export const Home = ({ safes }: { safes: Safe[] }) => (
     </Link>
   </Container>
 )
+{
+  /* <Link key={safe.id} href={`/safe/${safe.id}`}>
+<Item>{safe.id}</Item>
+</Link> */
+}
 
 const Container = styled.div``
 const List = styled.div`

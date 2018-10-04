@@ -5,8 +5,8 @@ export const wait = (delay: number = 0): Promise<void> =>
     onCancel && onCancel(clearTimeout(killTimeout))
   })
 
-export const throttle = (delay: number = 0) => fn => {
-  let pending = null
+export const throttle = (delay: number = 0) => (fn: Function) => {
+  let pending: TimeoutID | null = null
 
   const exec = () => {
     pending = null
@@ -14,29 +14,29 @@ export const throttle = (delay: number = 0) => fn => {
   }
 
   const out = () => {
-    if (pending) return
+    if (pending !== null) return
 
     pending = setTimeout(exec, delay)
   }
 
-  out.cancel = () => clearTimeout(pending)
+  out.cancel = () => pending !== null && clearTimeout(pending)
 
   return out
 }
 
-export const debounce = (delay: number) => fn => {
-  let pending = null
+export const debounce = (delay: number) => (fn: Function) => {
+  let pending: TimeoutID | null = null
   let _args = null
 
   const exec = () => fn(..._args)
 
-  const out = (...args) => {
+  const out = (...args: any) => {
     _args = args
-    clearTimeout(pending)
+    pending !== null && clearTimeout(pending)
     pending = setTimeout(exec, delay)
   }
 
-  out.cancel = () => clearTimeout(pending)
+  out.cancel = () => pending !== null && clearTimeout(pending)
 
   return out
 }

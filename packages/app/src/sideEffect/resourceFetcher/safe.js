@@ -1,8 +1,16 @@
 import * as blobStore from '~/service/blobStoreReader'
 
+import type { State, Store } from '~/store/type'
+import type { ID, PrivateKey } from '~/type'
+
 export const resourceName = 'safe'
 
-export const fetch = store => async ({ safeId, safePrivateKey }) => {
+type Param = { safeId: ID, safePrivateKey: PrivateKey }
+
+export const fetch = (store: Store) => async ({
+  safeId,
+  safePrivateKey,
+}: Param) => {
   const safe = await blobStore.getSafe(safeId, safePrivateKey)
 
   if (!safe)

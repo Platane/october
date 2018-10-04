@@ -1,5 +1,5 @@
 const { create } = require('./create')
-const blobStore = require('~/service/blobStore')
+const blobStore = require('~/service/blobStore/__mock__')
 
 const blobStoreReader = create(blobStore)
 

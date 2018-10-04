@@ -22,6 +22,11 @@ Resources:
     Properties:
       Name: !Ref AWS::StackName
 
+  apiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Enabled: true
+
   safeResource:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -200,3 +205,6 @@ Outputs:
   appUrl:
     Description: 'app endpoint URL'
     Value: !Sub 'https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/'
+  # apiKey:
+  #   Description: 'app api key'
+  #   Value: !GetAtt apiKey.ApiKey

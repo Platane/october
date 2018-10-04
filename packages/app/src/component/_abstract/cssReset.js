@@ -1,7 +1,7 @@
 import { injectGlobal, hydrate } from 'react-emotion'
 import React, { Component } from 'react'
 import { black } from './palette'
-import type { Component as ComponentType } from 'react'
+import type { ComponentType } from 'react'
 
 export const injectReset = () => injectGlobal`
   *,
@@ -33,8 +33,8 @@ export const injectReset = () => injectGlobal`
   }
   `
 
-export const withCssReset = (C: ComponentType<{}>) =>
-  class WithCssReset extends Component<{}> {
+export const withCssReset = (C: ComponentType<*>) =>
+  class WithCssReset extends Component<*> {
     constructor() {
       super()
       injectReset()

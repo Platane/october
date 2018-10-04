@@ -1,6 +1,8 @@
-export opaque type PrivateKey = string
-export opaque type PublicKey = string
-export opaque type Hash = string
+import { safeJSONparse } from '~/util/json'
+
+export type PrivateKey = string
+export type PublicKey = string
+export type Hash = string
 
 export const createPrivateKey = (): PrivateKey =>
   Math.random()
@@ -12,14 +14,6 @@ export const createPublicKey = (privateKey: PrivateKey): PublicKey =>
 
 export const sign = (payload: string, privateKey: PrivateKey): string =>
   createPublicKey(privateKey) + '[' + payload + ']'
-
-const safeJSONparse = x => {
-  try {
-    return JSON.parse(x)
-  } catch (err) {
-    return null
-  }
-}
 
 export const decode = (
   payload: string,
