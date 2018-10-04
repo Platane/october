@@ -14,6 +14,8 @@
   "scripts": {
     "start": "(cd ./packages/app ; yarn start)",
     "test:browser": "(cd ./packages/app ; yarn test:browser)",
-    "test": "( cd packages/app && yarn test ) && ( cd packages/blobstore-aws-dynamodb && yarn test )"
+    "test": "( cd packages/app && yarn test ) && ( cd packages/blobstore-aws-dynamodb && yarn test )",
+    "build": "( cd packages/blobstore-aws-dynamodb && yarn build )",
+    "type": "( cd packages/app && yarn flow-typed install && yarn type )"
   }
 }
