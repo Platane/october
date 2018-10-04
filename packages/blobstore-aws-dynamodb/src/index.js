@@ -9,6 +9,14 @@ import { exec as createUser } from './controller/createUser'
 import { exec as createSafe } from './controller/createSafe'
 import { exec as getSafe } from './controller/getSafe'
 
+const headers = {
+  'Content-Type': 'application/json',
+  'access-control-allow-headers':
+    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+  'access-control-allow-methods': 'POST,OPTIONS,PUT',
+  'access-control-allow-origin': '*',
+}
+
 export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
   const path = event.path
     .split('/')
@@ -34,12 +42,12 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
   return exec(docClient)(path, event.body && JSON.parse(event.body))
     .then(body => ({
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body,
     }))
     .catch(err => ({
       statusCode: (err && err.statusCode) || 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: { message: err && err.message },
     }))
 }
