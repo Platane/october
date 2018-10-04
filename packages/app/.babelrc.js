@@ -13,6 +13,11 @@ const plugins = [
     'babel-plugin-module-resolver',
     {
       alias: {
+        '~/service/blobStore':
+          process.env.NODE_ENV === 'test'
+            ? './src/service/blobStore/__mock__'
+            : './src/service/blobStore',
+
         '~': './src',
       },
     },
