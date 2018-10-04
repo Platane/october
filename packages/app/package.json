@@ -13,6 +13,7 @@
     "instascan": "1.0.0",
     "node-fetch": "2.2.0",
     "prop-types": "15.6.2",
+    "querystring": "0.2.0",
     "react": "16.5.2",
     "react-dom": "16.5.2",
     "react-emotion": "9.2.10",

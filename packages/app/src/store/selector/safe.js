@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect'
 
+import { APP_ORIGIN } from '~/config'
+
 import type { State } from '../reducer'
 import type { ID, FlatSafe, Safe, PrivateKey } from '~/type'
 
@@ -37,4 +39,14 @@ export const selectCurrentSafePrivateKey = createSelector(
   state => state.safe.safePrivateKeyById,
 
   (safeId, safePrivateKeyById) => safePrivateKeyById[(safeId: any)]
+)
+
+export const selectCurrentSafeShareUrl = createSelector(
+  selectCurrentSafeId,
+  selectCurrentSafePrivateKey,
+
+  (safeId, safePrivateKeyById) =>
+    safeId &&
+    safePrivateKeyById &&
+    `${APP_ORIGIN}/safe/${safeId}#privateKey=${safePrivateKeyById}`
 )

@@ -1,5 +1,7 @@
 import { chainReducer } from '~/util/chainReducer'
 
+import { selectCurrentSafeId } from '~/store/selector'
+
 import type { FlatSafe, PrivateKey, PublicKey, ID } from '~/type'
 import type { Action } from '~/store/action/type'
 
@@ -92,6 +94,34 @@ const reduceMutation = (state: State, action: Action): State => {
           },
         },
       }
+  }
+
+  return state
+}
+
+export const reduceRoot = (state, action) => {
+  /**
+   * read the privatekey from the url
+   */
+  if (state.router.hash && state.router.hash.includes('privateKey')) {
+    // parse
+    const [_, privateKey] = state.router.hash.split('privateKey=')
+    const safeId = selectCurrentSafeId(state)
+
+    return {
+      ...state,
+      router: {
+        ...state.router,
+        hash: '',
+      },
+      safe: {
+        ...state.safe,
+        safePrivateKeyById: {
+          ...state.safe.safePrivateKeyById,
+          [safeId]: privateKey,
+        },
+      },
+    }
   }
 
   return state

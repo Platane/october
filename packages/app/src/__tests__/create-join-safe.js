@@ -14,7 +14,7 @@ import type { ID } from '~/type'
 
 const sideEffects = [initResourceFetcher]
 
-test('scenario', async t => {
+test('scenario create-join-safe', async t => {
   /**
    * create a safe from storeA
    */
