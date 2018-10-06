@@ -28,6 +28,7 @@
     "flow-runtime": "0.17.0",
     "flow-typed": "2.5.1",
     "prettier": "1.14.3",
+    "query-string": "6.2.0",
     "tap-spec": "5.0.0",
     "tape": "4.9.1",
     "webpack": "4.16.5",

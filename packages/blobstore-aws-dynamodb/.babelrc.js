@@ -22,5 +22,8 @@ const presets = [
 if (process.env.BABEL_ENV === 'test') {
   plugins.push('@babel/plugin-transform-modules-commonjs')
 }
+if (process.env.BABEL_ENV === 'node') {
+  plugins.push('@babel/plugin-transform-modules-commonjs')
+}
 
 module.exports = { plugins, presets }

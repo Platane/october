@@ -1,7 +1,13 @@
 const fs = require('fs')
+const url = require('url')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WebpackAssetsManifest = require('webpack-assets-manifest')
+const lambdaExec = require('@october/blobstore-aws-dynamodb/script/lambdaExec')
+
+const blobstoreExec = lambdaExec(
+  path.resolve(__dirname, '../../blobstore-aws-dynamodb/src/index.js')
+)
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -56,5 +62,14 @@ module.exports = {
     watchOptions: {
       ignored: /node_modules/,
     },
+    before: app =>
+      app.get('/blobstore/*', async (req, res) =>
+        res.end(
+          await blobstoreExec(
+            url.parse(req.url.split('/blobstore')[1] || ''),
+            req.method
+          )
+        )
+      ),
   },
 }
