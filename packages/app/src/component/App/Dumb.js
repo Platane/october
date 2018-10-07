@@ -1,8 +1,10 @@
 import React from 'react'
 import styled from 'react-emotion'
 import { Home } from '../_page/Home'
+import { Safe } from '../_page/Safe'
 import { ShareSafe } from '../_page/ShareSafe'
 import { CreateSafe } from '../_page/CreateSafe'
+import { CreateTransaction } from '../_page/CreateTransaction'
 
 const FourOFour = ({ routerKey, ...props }) => (
   <div>
@@ -23,7 +25,11 @@ const Content = ({ router, ...props }) => {
       return <ShareSafe />
 
     case 'safe':
+      return <Safe />
+
     case 'createTransaction':
+      return <CreateTransaction />
+
     case 'transaction':
     default:
       return <FourOFour routerKey={router.key} {...props} />

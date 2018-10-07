@@ -17,8 +17,7 @@ const hydrateSafe = ({ users, transactions, ...rest }: FlatSafe): Safe =>
     })),
   }: any)
 
-export const selectCurrentSafeId = (state: State): ID | null =>
-  (state.router.param.safeId: any) || null
+export const selectCurrentSafeId = (state: State) => state.router.param.safeId
 
 export const selectCurrentSafe = createSelector(
   selectCurrentSafeId,
@@ -49,4 +48,10 @@ export const selectCurrentSafeShareUrl = createSelector(
     safeId &&
     safePrivateKeyById &&
     `${APP_ORIGIN}/safe/${safeId}#privateKey=${safePrivateKeyById}`
+)
+
+export const selectCurrentSafeUsers = createSelector(
+  selectCurrentSafe,
+
+  safe => safe && safe.users
 )

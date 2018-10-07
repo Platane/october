@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'react-emotion'
 import { Link } from '~/component/Link'
-import type { Safe } from '~/type'
 
 type Props = { shareUrl: string }
 

@@ -33,7 +33,7 @@ const selectRequired = createSelector(
       //
       !safe &&
         safeId &&
-        selectCurrentSafePrivateKey && {
+        safePrivateKey && {
           resourceName: 'safe',
           safeId,
           safePrivateKey,

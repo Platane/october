@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'react-emotion'
-import type { Safe } from '~/type'
+import { InputText } from '~/component/Input/InputText'
+import { Button } from '~/component/Button'
 
 const Input = ({ value, onChange, ...props }) => (
   <input {...props} value={value} onChange={e => onChange(e.target.value)} />
@@ -17,7 +18,7 @@ export const CreateSafe = ({ value, onChange, onSubmit }: Props) => (
     <h1>Create safe</h1>
 
     <form onSubmit={onSubmit}>
-      <InputForm
+      <InputText
         type="text"
         placeholder="safe name"
         value={value.name}
@@ -30,9 +31,3 @@ export const CreateSafe = ({ value, onChange, onSubmit }: Props) => (
 )
 
 const Container = styled.div``
-const InputForm = styled(Input)`
-  padding: 16px;
-`
-const Button = styled.button`
-  padding: 16px;
-`

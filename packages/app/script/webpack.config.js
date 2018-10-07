@@ -65,21 +65,15 @@ module.exports = {
         const { originalUrl, method } = req
         const u = url.parse(originalUrl.split('/blobstore')[1] || '/')
 
-        const proxy = http
-          .request({ ...u, method, port: BLOBSTORE_SERVER_PORT }, proxyRes => {
+        const proxy = http.request(
+          { ...u, method, port: BLOBSTORE_SERVER_PORT },
+          proxyRes => {
             proxyRes.pipe(
               res,
               { end: true }
             )
-          })
-          .on(
-            'error',
-            err =>
-              err.code === 'ECONNREFUSED' &&
-              console.error(
-                `could not find the blobstore server running on ${BLOBSTORE_SERVER_PORT}`
-              )
-          )
+          }
+        )
 
         req.pipe(
           proxy,

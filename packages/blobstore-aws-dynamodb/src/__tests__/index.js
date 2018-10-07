@@ -80,6 +80,18 @@ test(' PUT - /safe/:safeId/user', async t => {
 
   t.assert(res.statusCode === 200, 'status code ok')
 
+  {
+    const event = {
+      ...apiGatewayEvent,
+      path: `/safe/${safeId}`,
+      httpMethod: 'GET',
+    }
+
+    const res = await handler(event)
+
+    t.assert(res.body.users.includes('uuuu'), 'should have the user registred')
+  }
+
   t.end()
 })
 
@@ -121,5 +133,19 @@ test(' PUT - /safe/:safeId/transaction', async t => {
 
   t.assert(res.statusCode === 200, 'status code ok')
 
+  {
+    const event = {
+      ...apiGatewayEvent,
+      path: `/safe/${safeId}`,
+      httpMethod: 'GET',
+    }
+
+    const res = await handler(event)
+
+    t.assert(
+      res.body.transactions.includes('uuuu'),
+      'should have the transaction registred'
+    )
+  }
   t.end()
 })

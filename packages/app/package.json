@@ -19,6 +19,7 @@
     "react-emotion": "9.2.10",
     "react-propstransition": "2.0.6",
     "react-redux": "5.0.7",
+    "react-simplest-typeahead": "1.1.0",
     "redux": "4.0.0",
     "redux-thunk": "2.3.0",
     "reselect": "3.0.0",

@@ -21,13 +21,13 @@ export const createSafe = (
 export const putTransaction = (safeId: ID) => (
   transaction: Blob
 ): Promise<void> =>
-  fetch(`${BLOBSTORE_ENDPOINT}/safe/${safeId}/transactions`, {
+  fetch(`${BLOBSTORE_ENDPOINT}/safe/${safeId}/transaction`, {
     method: 'PUT',
-    bosy: { transaction },
+    body: { transaction },
   })
 
 export const putUser = (safeId: ID) => (user: Blob): Promise<void> =>
-  fetch(`${BLOBSTORE_ENDPOINT}/safe/${safeId}/users`, {
+  fetch(`${BLOBSTORE_ENDPOINT}/safe/${safeId}/user`, {
     method: 'PUT',
-    bosy: { user },
+    body: { user },
   })

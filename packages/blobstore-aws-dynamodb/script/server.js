@@ -37,7 +37,7 @@ http
 
     debug('server')('request over: %s', statusCode)
 
-    res.writeHead(statusCode, headers)
+    res.writeHead(+statusCode, headers)
     res.end(JSON.stringify(body || ''))
   })
   .listen(8085)

@@ -6,7 +6,7 @@ Description: 'Blobstore stack, create a dynamodb instance, and the lambda backed
 Parameters:
   Stage:
     Type: String
-    Default: staging
+    Default: v1
     Description: deployment stage
 
 Globals:

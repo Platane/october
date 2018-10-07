@@ -19,7 +19,7 @@ export const selectCurrentUserKeys = createSelector(
 export const selectCurrentUserPublicKey = createSelector(
   selectCurrentUserKeys,
 
-  (keys: { publicKey: string } | null) => (keys ? keys.publicKey : null)
+  keys => (keys ? keys.publicKey : null)
 )
 
 export const selectCurrentUser = createSelector(
