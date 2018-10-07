@@ -50,7 +50,7 @@ const lambdaExec = src => ({ pathname, search }, httpMethod = 'GET') => {
     path.resolve(__dirname, '../node_modules/.bin/babel-node'),
     [
       '-e',
-      `require("${src}").handler(${escapedEvent}).then(({body}) => console.log(body))`,
+      `require("${src}").handler(${escapedEvent}).then(({statusCode}) => statusCode!==200&&Promise.reject(statusCode)).then(({body}) => console.log(JSON.stringify(body)))`,
     ],
     {
       cwd: path.resolve(__dirname, '..'),

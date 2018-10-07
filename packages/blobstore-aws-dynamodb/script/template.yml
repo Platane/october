@@ -234,6 +234,7 @@ Resources:
       Environment:
         Variables:
           SAFE_TABLE: !Ref safeTable
+          DEBUG: 'routing'
 
   storeLambdaExecutionRole:
     Type: AWS::IAM::Role

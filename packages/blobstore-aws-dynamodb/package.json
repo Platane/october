@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "aws-sdk": "2.326.0",
+    "debug": "4.0.1",
     "flow-aws-lambda": "1.0.3"
   },
   "devDependencies": {
@@ -36,6 +37,7 @@
     "zip-webpack-plugin": "^3.0.0"
   },
   "scripts": {
+    "start": "DEBUG=server,routing BABEL_ENV=node babel-node ./script/server.js",
     "build": "webpack --config ./script/webpack.config.js",
     "test": "BABEL_ENV=test babel-node ./src/__tests__/index.js | tap-spec"
   }

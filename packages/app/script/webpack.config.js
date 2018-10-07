@@ -1,15 +1,13 @@
 const fs = require('fs')
 const url = require('url')
 const path = require('path')
+const http = require('http')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WebpackAssetsManifest = require('webpack-assets-manifest')
-const lambdaExec = require('@october/blobstore-aws-dynamodb/script/lambdaExec')
-
-const blobstoreExec = lambdaExec(
-  path.resolve(__dirname, '../../blobstore-aws-dynamodb/src/index.js')
-)
 
 const production = process.env.NODE_ENV === 'production'
+
+const BLOBSTORE_SERVER_PORT = 8085
 
 module.exports = {
   entry: {
@@ -63,13 +61,30 @@ module.exports = {
       ignored: /node_modules/,
     },
     before: app =>
-      app.get('/blobstore/*', async (req, res) =>
-        res.end(
-          await blobstoreExec(
-            url.parse(req.url.split('/blobstore')[1] || ''),
-            req.method
+      app.use('/blobstore/*', async (req, res) => {
+        const { originalUrl, method } = req
+        const u = url.parse(originalUrl.split('/blobstore')[1] || '/')
+
+        const proxy = http
+          .request({ ...u, method, port: BLOBSTORE_SERVER_PORT }, proxyRes => {
+            proxyRes.pipe(
+              res,
+              { end: true }
+            )
+          })
+          .on(
+            'error',
+            err =>
+              err.code === 'ECONNREFUSED' &&
+              console.error(
+                `could not find the blobstore server running on ${BLOBSTORE_SERVER_PORT}`
+              )
           )
+
+        req.pipe(
+          proxy,
+          { end: true }
         )
-      ),
+      }),
   },
 }

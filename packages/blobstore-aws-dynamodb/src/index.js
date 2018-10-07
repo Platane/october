@@ -8,6 +8,7 @@ import { exec as createTransaction } from './controller/createTransaction'
 import { exec as createUser } from './controller/createUser'
 import { exec as createSafe } from './controller/createSafe'
 import { exec as getSafe } from './controller/getSafe'
+import debug from 'debug'
 
 const headers = {
   'Content-Type': 'application/json',
@@ -25,6 +26,8 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
 
   const m = event.httpMethod.toUpperCase()
 
+  debug('routing')('%s: %j', m, path)
+
   let exec =
     (m === 'PUT' &&
       path[0] === 'safe' &&
@@ -33,6 +36,9 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
     (m === 'PUT' && path[0] === 'safe' && path[2] === 'user' && createUser) ||
     (m === 'PUT' && path[0] === 'safe' && createSafe) ||
     (m === 'GET' && path[0] === 'safe' && getSafe) ||
+    (m === 'GET' &&
+      path[0] === 'ping' &&
+      (() => () => Promise.resolve({ statusCode: 200 }))) ||
     (() => () => Promise.reject({ statusCode: 405 }))
 
   AWS.config.update(config.aws)
