@@ -6,7 +6,12 @@ const plugins = [
   [
     'transform-inline-environment-variables',
     {
-      include: ['APP_ORIGIN', 'BLOBSTORE_ENDPOINT'],
+      include: [
+        'APP_BASENAME',
+        'APP_ORIGIN',
+        'BLOBSTORE_ENDPOINT',
+        'BLOBSTORE_API_KEY',
+      ],
     },
   ],
   [
@@ -32,7 +37,17 @@ const presets = [
 ]
 
 if (process.env.NODE_ENV === 'production') {
-  presets.push('@babel/preset-env')
+  presets.push([
+    '@babel/preset-env',
+    { modules: false, targets: { chrome: '63', edge: '17', firefox: '62' } },
+  ])
+  plugins.push([
+    '@babel/plugin-transform-runtime',
+    {
+      helpers: false,
+      regenerator: true,
+    },
+  ])
 }
 
 if (process.env.NODE_ENV === 'test') {

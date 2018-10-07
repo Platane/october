@@ -6,7 +6,7 @@ Description: 'Blobstore stack, create a dynamodb instance, and the lambda backed
 Parameters:
   Stage:
     Type: String
-    Default: v1
+    Default: 'v1'
     Description: deployment stage
 
 Globals:
@@ -22,10 +22,40 @@ Resources:
     Properties:
       Name: !Ref AWS::StackName
 
+  apiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref apiGatewayDeployment
+      RestApiId: !Ref apiGateway
+      StageName: !Ref Stage
+
   apiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties:
       Enabled: true
+      # StageKeys:
+      #   - RestApiId: !Ref apiGateway
+      #     StageName": !Ref Stage
+
+  apiUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref apiGateway
+          Stage: !Ref apiStage
+      Quota:
+        Limit: 20000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 10
+        RateLimit: 10
+
+  apiUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref apiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref apiUsagePlan
 
   safeResource:
     Type: AWS::ApiGateway::Resource
@@ -224,12 +254,11 @@ Resources:
       - safeSafeIdTransactionMethodOption
     Properties:
       RestApiId: !Ref apiGateway
-      StageName: !Ref Stage
 
   storeLambda:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: '../.build/bundle.zip'
+      CodeUri: '../packages/blobstore-aws-dynamodb/.build/bundle.zip'
       Role: !GetAtt storeLambdaExecutionRole.Arn
       Environment:
         Variables:
@@ -280,7 +309,7 @@ Resources:
       SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/*/*'
 
   safeTable:
-    Type: 'AWS::DynamoDB::Table'
+    Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
         - AttributeName: 'id'
@@ -294,10 +323,40 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
 
+  staticAssetBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods:
+              - GET
+            AllowedOrigins:
+              - '*'
+      WebsiteConfiguration:
+        ErrorDocument: index.html
+        IndexDocument: index.html
+        # RoutingRules:
+        #   - RedirectRule:
+        #       HttpRedirectCode: '301'
+        #       Protocol: http
+        #       ReplaceKeyWith: index.html
+        #     RoutingRuleCondition:
+        #       HttpErrorCodeReturnedEquals: '403'
+        #   - RedirectRule:
+        #       HttpRedirectCode: '301'
+        #       Protocol: http
+        #       ReplaceKeyWith: index.html
+        #     RoutingRuleCondition:
+        #       HttpErrorCodeReturnedEquals: '404'
+
 Outputs:
   appUrl:
     Description: 'app endpoint URL'
-    Value: !Sub 'https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/'
-  # apiKey:
-  #   Description: 'app api key'
-  #   Value: !GetAtt apiKey.ApiKey
+    Value: !Sub 'https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+  s3Url:
+    Description: 'bucket public access url'
+    Value: !Sub 'https://${staticAssetBucket}.s3-website-${AWS::Region}.amazonaws.com'
+  bucketName:
+    Description: 'static asset bucket name'
+    Value: !Ref staticAssetBucket

@@ -12,9 +12,8 @@ import debug from 'debug'
 
 const headers = {
   'Content-Type': 'application/json',
-  'access-control-allow-headers':
-    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-  'access-control-allow-methods': 'POST,OPTIONS,PUT',
+  'access-control-allow-headers': 'Content-Type,Authorization,X-Api-Key',
+  'access-control-allow-methods': 'OPTIONS,GET,PUT',
   'access-control-allow-origin': '*',
 }
 

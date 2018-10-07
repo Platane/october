@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "start": "(cd ./packages/app ; yarn start)",
+    "deploy": "./infrastructure/deploy.sh",
     "test:browser": "(cd ./packages/app ; yarn test:browser)",
     "test": "( cd packages/app && yarn test ) && ( cd packages/blobstore-aws-dynamodb && yarn test )",
     "build": "( cd packages/blobstore-aws-dynamodb && yarn build )",

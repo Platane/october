@@ -15,9 +15,9 @@ module.exports = {
   },
 
   output: {
-    path: path.join(__dirname, '../dist'),
+    path: path.join(__dirname, '../.build'),
     filename: production ? '[name]-[hash:8].js' : '[name].js',
-    publicPath: '/',
+    publicPath: process.env.APP_BASENAME || '/',
   },
 
   module: {
@@ -43,7 +43,7 @@ module.exports = {
 
   plugins: [
     new WebpackAssetsManifest({
-      output: path.resolve(__dirname, '../dist', 'assetManifest.json'),
+      output: path.resolve(__dirname, '../.build', 'assetManifest.json'),
     }),
 
     new HtmlWebpackPlugin({
