@@ -13,7 +13,11 @@ set -e
 # cp ../packages/apps/lambda-static-asset-server/.build/bundle.zip lambda-static-asset-server-bundle.zip
 #
 
-export STACKNAME="safe-blobstore-aws-dynamodb"
+export SHA=${CIRCLE_SHA1:-'locall'}
+export STACKNAME="safe-blobstore-aws-dynamodb-$SHA"
+export DOMAIN="october.yellow-sail-lab.de"
+export BRANCH_SLUG=`echo ${CIRCLE_BRANCH:-'local'} | sed 's/[^a-zA-Z0-9]/-/g'`
+export CERTIFICATE_ARN="arn:aws:acm:eu-west-1:741455069825:certificate/618f8d6b-3b5c-4b21-8a53-ee8ba7fa24c7"
 
 ( cd ./packages/blobstore-aws-dynamodb ; yarn build )
 
@@ -27,9 +31,10 @@ aws cloudformation package \
   --output-template-file .build/packaged-template.yml \
 
 aws cloudformation deploy \
+  --parameter-overrides Domain=$DOMAIN CertificateArn=$CERTIFICATE_ARN Sha=$SHA BranchSlug=$BRANCH_SLUG \
   --template-file .build/packaged-template.yml \
   --stack-name $STACKNAME \
-  --tags app=safe-blobstore-aws-dynamodb \
+  --tags app=safe-blobstore-aws-dynamodb sha=$SHA branchSlug=$BRANCH_SLUG \
   --capabilities CAPABILITY_IAM
 
 
@@ -55,3 +60,4 @@ export BLOBSTORE_ENDPOINT=$APP_URL
 ( cd ./packages/app ; yarn build )
 
 aws s3 mv --no-progress --recursive --acl "public-read" ./packages/app/.build/ s3://$BUCKET_NAME
+

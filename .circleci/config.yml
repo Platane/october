@@ -60,6 +60,14 @@ jobs:
 
       - run: yarn build
 
+  deploy:
+    <<: *node_config
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run: yarn deploy
+
 workflows:
   version: 2
   build-deploy:
@@ -77,3 +85,6 @@ workflows:
       - type:
           requires:
             - install
+      - deploy:
+          requires:
+            - build

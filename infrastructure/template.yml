@@ -9,6 +9,23 @@ Parameters:
     Default: 'v1'
     Description: deployment stage
 
+  Domain:
+    Type: String
+    Description: 'base domain'
+    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
+
+  Sha:
+    Type: String
+    Description: 'unique build identifier'
+
+  BranchSlug:
+    Type: String
+    Description: 'url safe branch name'
+
+  CertificateArn:
+    Type: String
+    Description: 'ARN for certificate'
+
 Globals:
   Function:
     Handler: index.handler
@@ -350,10 +367,52 @@ Resources:
         #     RoutingRuleCondition:
         #       HttpErrorCodeReturnedEquals: '404'
 
+  # CustomDomainCertificate:
+  #   Type: 'AWS::CertificateManager::Certificate'
+  #   Properties:
+  #     DomainName: !Ref Domain
+
+  BranchDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Sub '${BranchSlug}.${Domain}'
+      RegionalCertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - 'REGIONAL'
+
+  BranchDomainBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: ''
+      DomainName: !Ref BranchDomain
+      RestApiId: !Ref apiGateway
+      Stage: !Ref apiStage
+
+  UniqueDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Sub '${Sha}.${Domain}'
+      RegionalCertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - 'REGIONAL'
+
+  UniqueDomainBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: ''
+      DomainName: !Ref UniqueDomain
+      RestApiId: !Ref apiGateway
+      Stage: !Ref apiStage
+
 Outputs:
-  appUrl:
+  appUrl2:
     Description: 'app endpoint URL'
     Value: !Sub 'https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+  appUrl:
+    Description: 'app endpoint URL'
+    Value: !Sub 'https://${Sha}.${Domain}'
   s3Url:
     Description: 'bucket public access url'
     Value: !Sub 'https://${staticAssetBucket}.s3-website-${AWS::Region}.amazonaws.com'
