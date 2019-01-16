@@ -4,4 +4,5 @@ yarn-error.log*
 lib
 dist
 .build
+.data
 flow-typed

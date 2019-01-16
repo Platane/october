@@ -1,0 +1,38 @@
+{
+  "name": "@october/blobstore-fs",
+  "description": "...",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "8.10"
+  },
+  "dependencies": {
+    "debug": "4.0.1",
+    "koa": "2.6.2",
+    "koa-body": "^4.0.6",
+    "koa-router": "7.4.0",
+    "koa2-cors": "2.0.6",
+    "koa2-cors-error": "1.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.1.0",
+    "@babel/core": "7.1.0",
+    "@babel/node": "7.0.0",
+    "@babel/plugin-proposal-class-properties": "7.1.0",
+    "@babel/plugin-proposal-export-namespace-from": "7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0",
+    "@babel/plugin-transform-modules-commonjs": "7.1.0",
+    "@babel/preset-env": "7.1.0",
+    "@babel/preset-flow": "7.0.0",
+    "babel-plugin-flow-runtime": "0.17.0",
+    "babel-plugin-module-resolver": "3.1.1",
+    "babel-plugin-transform-inline-environment-variables": "0.4.3",
+    "flow-bin": "0.81.0",
+    "flow-typed": "2.5.1",
+    "prettier": "1.14.3"
+  },
+  "scripts": {
+    "prepare": "rm -rf .data && mkdir .data",
+    "start": "DEBUG=server,routing BABEL_ENV=node babel-node -e \"require('./src/index').create().then(({url})=>console.log(url))\""
+  }
+}
